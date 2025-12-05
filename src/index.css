@@ -1,305 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+  body {
+    @apply bg-background-page text-text-primary font-body antialiased selection:bg-accent-500/30 selection:text-white;
   }
-
-  .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
   }
 }
 
-/* Dark Navy Pulse Theme Components */
-@layer components {
-  /* Typography Classes */
-  .text-hero {
-    @apply font-display text-text-primary leading-tight;
-    font-size: 56px;
-  }
+@layer utilities {
+  /* Enigma Design System Utilities */
   
-  .text-h1 {
-    @apply font-display font-bold text-text-primary leading-snug;
-    font-size: 40px;
-  }
-  
-  .text-h2 {
-    @apply font-display font-semibold text-text-primary leading-snug;
-    font-size: 32px;
-  }
-  
-  .text-h3 {
-    @apply font-display font-semibold text-text-primary;
-    font-size: 24px;
-  }
-  
-  .text-body-lg {
-    @apply font-primary text-text-secondary leading-relaxed;
-    font-size: 18px;
-  }
-  
-  .text-body {
-    @apply font-primary text-text-primary;
-    font-size: 16px;
-  }
-  
-  .text-small {
-    @apply font-primary text-text-tertiary uppercase tracking-wider;
-    font-size: 14px;
-  }
-  
-  .text-xs {
-    @apply font-primary font-medium text-text-muted uppercase;
-    font-size: 12px;
+  .terminal-border {
+    @apply border border-accent-500/30 shadow-[0_0_10px_rgba(0,224,208,0.1)_inset];
   }
 
-  /* Button Components */
+  .terminal-text {
+    @apply font-mono tracking-wider text-accent-500;
+    text-shadow: 0 0 5px rgba(0, 224, 208, 0.5);
+  }
+
   .btn-primary {
-    @apply bg-gradient-button text-text-primary px-8 py-3 font-semibold text-body 
-           hover:brightness-110 hover:shadow-glow-blue hover:scale-105 
-           transition-all duration-standard ease-out 
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:brightness-100;
+    @apply bg-accent-500 text-black font-bold font-mono uppercase tracking-widest px-6 py-3 
+           hover:bg-accent-400 hover:scale-105 hover:shadow-glow transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply border-2 border-cyan-teal text-blue-vibrant bg-transparent px-8 py-3 
-           font-semibold text-body hover:bg-blue-vibrant hover:text-text-primary hover:shadow-glow-cyan-sm 
-           transition-all duration-standard ease-out;
+    @apply border border-accent-500/50 text-accent-500 font-mono uppercase tracking-widest px-6 py-3
+           hover:bg-accent-500/10 hover:border-accent-500 transition-all duration-200;
   }
 
-  .btn-ghost {
-    @apply bg-transparent text-text-secondary px-6 py-2 font-medium text-body 
-           hover:bg-navy-hover hover:text-text-primary transition-all duration-fast;
-  }
-
-  /* Card Components */
-  .card-dark {
-    @apply bg-navy-elevated border border-border-subtle shadow-card rounded-lg 
-           hover:bg-navy-hover hover:border-border-moderate hover:-translate-y-1 
-           hover:shadow-glow-cyan-sm
-           transition-all duration-standard ease-out;
-  }
-
-  .card-trader {
-    @apply card-dark p-8 relative min-h-[200px];
-  }
-
-  /* Input Components */
   .input-dark {
-    @apply bg-navy-elevated border border-border-subtle text-text-primary 
-           px-4 py-3 placeholder:text-text-muted
-           focus:border-blue-vibrant focus:ring-2 focus:ring-blue-vibrant/20 focus:outline-none
-           transition-all duration-fast;
+    @apply bg-neutral-100 border border-neutral-800 text-white p-3 font-mono 
+           focus:border-accent-500 focus:outline-none focus:shadow-[0_0_15px_rgba(0,224,208,0.1)] transition-all;
   }
 
-  /* Header Components */
-  .header-dark {
-    @apply bg-navy-deep backdrop-blur-dark border-b border-border-subtle 
-           h-[72px] sticky top-0 z-50;
+  .card-base {
+    @apply bg-background-surface border border-neutral-800 relative overflow-hidden;
   }
-
-  /* Modal Components */
-  .modal-overlay {
-    @apply fixed inset-0 flex items-center justify-center z-50 p-4;
-    background: rgba(10, 14, 39, 0.8);
-    backdrop-filter: blur(4px);
+  
+  /* Scanline effect for backgrounds */
+  .bg-scanline {
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,0),
+      rgba(255,255,255,0) 50%,
+      rgba(0,0,0,0.2) 50%,
+      rgba(0,0,0,0.2)
+    );
+    background-size: 100% 4px;
   }
-
-  .modal-content {
-    @apply bg-navy-elevated border border-border-moderate shadow-modal 
-           rounded-lg max-w-md w-full p-8;
-  }
-
-  /* Feature Card */
-  .feature-card {
-    @apply text-center p-6;
-  }
-
-  .feature-icon {
-    @apply inline-flex items-center justify-center w-16 h-16 rounded-full 
-           bg-navy-accent-dark text-cyan-electric mb-4 shadow-glow-cyan-sm;
-  }
-
-  /* Stats Grid */
-  .stats-card {
-    @apply bg-navy-elevated border border-border-subtle rounded-lg p-6 
-           text-center hover:bg-navy-hover transition-all duration-standard;
-  }
-
-  .stats-value {
-    @apply text-h2 font-bold text-text-primary mb-2;
-  }
-
-  .stats-label {
-    @apply text-small text-text-tertiary;
-  }
-
-  /* Preview Badge */
-  .preview-badge {
-    @apply inline-flex items-center space-x-2 bg-navy-accent-dark 
-           text-cyan-electric px-4 py-2 rounded-full font-semibold text-xs;
-  }
-
-  /* Authentication Modal Specific */
-  .auth-label {
-    @apply block text-small font-medium text-text-secondary mb-2;
-  }
-
-  /* Nav Logo */
-  .nav-logo {
-    @apply flex items-center space-x-3;
-  }
-
-  .nav-logo-icon {
-    @apply bg-navy-elevated p-2 rounded-lg shadow-glow-cyan-sm;
-  }
-
-  .nav-logo-text {
-    @apply text-h3 font-display font-semibold text-text-primary;
-  }
-
-  /* Tab Navigation */
-  .tab-nav {
-    @apply border-b border-border-subtle flex space-x-8;
-  }
-
-  .tab-button {
-    @apply px-6 py-3 font-medium text-body border-b-2 border-transparent
-           text-text-tertiary hover:text-text-secondary hover:bg-navy-elevated
-           data-[active=true]:text-cyan-electric data-[active=true]:border-cyan-electric
-           data-[active=true]:shadow-glow-cyan-sm transition-all duration-fast;
-  }
-
-  /* Loading States */
-  .loading-spinner {
-    @apply animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent;
-  }
-
-  /* Grid Layouts */
-  .grid-responsive-4 {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
-  }
-
-  .grid-responsive-3 {
-    @apply grid grid-cols-1 md:grid-cols-3 gap-6;
-  }
-
-  .grid-responsive-2 {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-  }
-
-  .grid-responsive-1 {
-    @apply grid grid-cols-1 gap-6;
-  }
-}
-
-/* Responsive Font Sizes */
-@layer utilities {
-  @media (max-width: 640px) {
-    .text-hero { font-size: 36px !important; }
-    .text-h1 { font-size: 32px !important; }
-    .text-h2 { font-size: 24px !important; }
-  }
-
-  /* Reduced Motion Support */
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-    
-    .glow-pulse {
-      animation: none !important;
-    }
-  }
-
-  /* Glow Effect Utilities */
-  .glow-cyan {
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
-  }
-
-  .glow-cyan-md {
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3);
-  }
-
-  .glow-cyan-lg {
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.6), 0 0 60px rgba(0, 212, 255, 0.4), 0 0 90px rgba(0, 212, 255, 0.2);
-  }
-
-  .glow-blue {
-    box-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
-  }
-
-  .glow-green {
-    box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
-  }
-
-  .glow-red {
-    box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
-  }
-
-  /* Backdrop blur for glassmorphism */
-  .backdrop-blur-dark {
-    backdrop-filter: blur(20px);
-    background: rgba(15, 20, 25, 0.9);
-  }
-
-  /* Hero Waveform Animation */
-  .waveform-pulse {
-    animation: pulse-glow 3000ms ease-in-out infinite;
-  }
-
-  .waveform-float {
-    animation: wavefloat 4s ease-in-out infinite;
-  }
-
-  /* Gradient Text */
-  .gradient-text {
-    background: linear-gradient(135deg, #00d4ff 0%, #06b6d4 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* High contrast for accessibility */
-  .hc-text-primary {
-    color: #f1f5f9 !important;
-  }
-
-  .hc-text-secondary {
-    color: #cbd5e1 !important;
-  }
-
-  /* Focus states for accessibility */
-  .focus-glow {
-    @apply focus:ring-2 focus:ring-cyan-electric/20 focus:border-cyan-electric focus:outline-none;
-  }
-}
-
-img {
-  object-position: top;
-}
-
-.fixed {
-  position: fixed;
 }

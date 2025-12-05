@@ -5,28 +5,26 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import TraderProfile from './pages/TraderProfile'
+import Login from './pages/Login'
 import './App.css'
-import CyberpunkBackground from './components/CyberpunkBackground';
-import PulsingGlowBackground from './components/PulsingGlowBackground';
+// Note: We will replace the old backgrounds with the Enigma Grid in the next phase, 
+// for now keeping imports to avoid build break
+import CyberpunkBackground from './components/CyberpunkBackground'; 
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user, isGuest, loading } = useAuth();
   const location = useLocation();
   
-  // Debug: Log current path
-  React.useEffect(() => {
-    if (location.pathname.startsWith('/profile/')) {
-      const walletAddress = location.pathname.split('/')[2];
-      console.log('App.tsx - Profile route active, walletAddress:', walletAddress);
-    }
-  }, [location.pathname]);
+  // Combine authenticated user OR guest mode
+  const canAccessDashboard = user || isGuest;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-background-page flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          {/* Enigma style loader */}
+          <div className="w-16 h-16 border-2 border-accent-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-accent-500 font-mono animate-pulse">INITIALIZING SYSTEM...</p>
         </div>
       </div>
     );
@@ -34,9 +32,11 @@ function AppContent() {
 
   return (
     <Routes>
-      <Route path="/" element={user ? <Dashboard /> : <Landing onShowAuth={() => {}} />} />
-      <Route path="/dashboard" element={user ? <Dashboard /> : <Landing onShowAuth={() => {}} />} />
-      <Route path="/profile/:walletAddress" element={user ? <TraderProfile /> : <Landing onShowAuth={() => {}} />} />
+      <Route path="/" element={canAccessDashboard ? <Dashboard /> : <Landing onShowAuth={() => {}} />} />
+      <Route path="/dashboard" element={canAccessDashboard ? <Dashboard /> : <Landing onShowAuth={() => {}} />} />
+      <Route path="/profile/:walletAddress" element={canAccessDashboard ? <TraderProfile /> : <Landing onShowAuth={() => {}} />} />
+      {/* Add direct route to login if needed, handled via modal mostly in Landing */}
+      <Route path="/login" element={<Login />} /> 
     </Routes>
   );
 }
@@ -45,7 +45,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <PulsingGlowBackground/>
+        {/* We will replace this background later */}
         <AppContent />
       </Router>
     </AuthProvider>

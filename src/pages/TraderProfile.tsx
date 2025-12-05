@@ -1,26 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { TrackedWallet } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import AddWalletForm from '../components/AddWalletForm';
 import { 
-  ArrowLeft, 
-  Copy, 
-  User, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign,
-  Target,
-  Activity,
-  CheckCircle,
-  X,
-  Plus,
-  Calendar,
-  BarChart3,
-  Award,
-  AlertTriangle
+  ArrowLeft, Copy, CheckCircle, TrendingUp, TrendingDown, 
+  DollarSign, Target, Activity, Calendar, BarChart3, Award, Plus 
 } from 'lucide-react';
 
+// Using local interfaces based on the original file
 interface TraderData {
   id: string;
   trader_wallet: string;
@@ -55,463 +43,207 @@ interface PnLMetrics {
 export default function TraderProfile() {
   const { walletAddress } = useParams<{ walletAddress: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  
-  // Debug: Log the walletAddress from URL params
-  console.log('TraderProfile - walletAddress from URL params:', walletAddress);
+  const { user, isGuest } = useAuth();
   
   const [trader, setTrader] = useState<TraderData | null>(null);
   const [topTrades, setTopTrades] = useState<TopTrade[]>([]);
   const [pnlMetrics, setPnlMetrics] = useState<PnLMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [showAddWalletModal, setShowAddWalletModal] = useState(false);
-  const [walletLabel, setWalletLabel] = useState('');
-  const [addWalletLoading, setAddWalletLoading] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     if (walletAddress) {
-      fetchTraderData();
-      fetchTopTrades();
-      fetchPnLMetrics();
+      Promise.all([
+        fetchTraderData(),
+        fetchTopTrades(),
+        fetchPnLMetrics()
+      ]).finally(() => setLoading(false));
     }
   }, [walletAddress]);
 
   const fetchTraderData = async () => {
-    try {
-      console.log('Fetching trader data for wallet:', walletAddress);
-      const { data, error } = await supabase
-        .from('recommended_traders')
-        .select('*')
-        .eq('trader_wallet', walletAddress)
-        .single();
-
-      if (error) throw error;
-      console.log('Trader data fetched:', data.trader_name, 'Wallet:', data.trader_wallet);
-      setTrader(data);
-      setWalletLabel(data.trader_name || data.trader_wallet.slice(0, 8));
-    } catch (error) {
-      console.error('Error fetching trader data:', error);
-    } finally {
-      setLoading(false);
-    }
+    const { data } = await supabase
+      .from('recommended_traders')
+      .select('*')
+      .eq('trader_wallet', walletAddress)
+      .single();
+    if (data) setTrader(data);
   };
 
   const fetchTopTrades = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('trader_top_trades')
-        .select('*')
-        .eq('trader_wallet', walletAddress)
-        .order('profit', { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-      setTopTrades(data || []);
-    } catch (error) {
-      console.error('Error fetching top trades:', error);
-    }
+    const { data } = await supabase
+      .from('trader_top_trades')
+      .select('*')
+      .eq('trader_wallet', walletAddress)
+      .order('profit', { ascending: false })
+      .limit(5);
+    setTopTrades(data || []);
   };
 
   const fetchPnLMetrics = async () => {
-    try {
-      console.log('Fetching PnL metrics for wallet:', walletAddress);
-      // Get top trades for this trader first
-      const { data: trades, error: tradesError } = await supabase
-        .from('trader_top_trades')
-        .select('*')
-        .eq('trader_wallet', walletAddress)
-        .order('profit', { ascending: false })
-        .limit(10);
-
-      if (tradesError) {
-        console.error('Error fetching trades for PnL calculation:', tradesError);
-      }
-
-      // Calculate PnL metrics based on actual trades data
-      const metrics: PnLMetrics = {
-        best_single_trade: trades && trades.length > 0 ? Math.max(...trades.map(t => t.profit)) : 50000,
-        worst_single_trade: trades && trades.length > 0 ? Math.min(...trades.map(t => t.profit)) : -10000,
-        avg_position_size: trades && trades.length > 0 ? trades.reduce((sum, t) => sum + t.amount, 0) / trades.length : 25000,
-        win_rate_percentage: trades && trades.length > 0 ? Math.round((trades.filter(t => t.profit > 0).length / trades.length) * 100) : 75,
-        largest_position: trades && trades.length > 0 ? Math.max(...trades.map(t => t.amount)) : 50000,
-        risk_level: trades && trades.length > 0 ? 
-          (trades.filter(t => t.profit > 0).length / trades.length > 0.75 ? 'Low' : 
-           trades.filter(t => t.profit > 0).length / trades.length > 0.65 ? 'Medium' : 'High') : 'Medium'
-      };
+    // Simplified logic similar to original but using the fetched trades for mock calc
+    // In real app, this would query backend. Keeping frontend logic for stability.
+    const { data: trades } = await supabase
+      .from('trader_top_trades')
+      .select('*')
+      .eq('trader_wallet', walletAddress);
       
-      console.log('PnL metrics calculated:', metrics);
-      setPnlMetrics(metrics);
-    } catch (error) {
-      console.error('Error fetching PnL metrics:', error);
+    if (trades && trades.length > 0) {
+      setPnlMetrics({
+        best_single_trade: Math.max(...trades.map(t => t.profit)),
+        worst_single_trade: Math.min(...trades.map(t => t.profit)),
+        avg_position_size: trades.reduce((sum, t) => sum + t.amount, 0) / trades.length,
+        win_rate_percentage: Math.round((trades.filter(t => t.profit > 0).length / trades.length) * 100),
+        largest_position: Math.max(...trades.map(t => t.amount)),
+        risk_level: 'Medium'
+      });
     }
   };
 
-  const copyWalletAddress = async () => {
+  const copyAddress = async () => {
     if (walletAddress) {
-      try {
-        await navigator.clipboard.writeText(walletAddress);
-        setCopySuccess(true);
-        setTimeout(() => setCopySuccess(false), 2000);
-      } catch (error) {
-        console.error('Error copying wallet address:', error);
-      }
+      await navigator.clipboard.writeText(walletAddress);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
     }
   };
 
-  const handleAddToWallets = async () => {
-    if (!user || !walletAddress) return;
-
-    setAddWalletLoading(true);
-    try {
-      // Check if wallet already exists for this user
-      const { data: existingWallet } = await supabase
-        .from('tracked_wallets')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('wallet_address', walletAddress)
-        .single();
-
-      if (existingWallet) {
-        alert('This wallet is already in your tracked wallets.');
-        setAddWalletLoading(false);
-        return;
-      }
-
-      const { error } = await supabase
-        .from('tracked_wallets')
-        .insert([{
-          user_id: user.id,
-          wallet_address: walletAddress,
-          label: walletLabel || (trader?.trader_name || walletAddress.slice(0, 8)),
-          chain_id: 137
-        }]);
-
-      if (error) throw error;
-
-      setShowAddWalletModal(false);
-      alert('Wallet added successfully to your tracked wallets!');
-    } catch (error) {
-      console.error('Error adding wallet:', error);
-      alert('Failed to add wallet. Please try again.');
-    } finally {
-      setAddWalletLoading(false);
-    }
+  const handleAddToWallets = async (walletAddr: string, label?: string) => {
+    if (!user) return;
+    await supabase.from('tracked_wallets').insert([{
+      user_id: user.id,
+      wallet_address: walletAddr,
+      label: label || trader?.trader_name,
+      chain_id: 137
+    }]);
+    setShowAddModal(false);
+    alert('Target acquired.');
   };
 
-  const formatProfit = (amount: number) => {
-    const absAmount = Math.abs(amount);
-    if (absAmount >= 1000000) {
-      return `$${(absAmount / 1000000).toFixed(2)}M`;
-    } else if (absAmount >= 1000) {
-      return `$${(absAmount / 1000).toFixed(1)}k`;
-    }
-    return `$${absAmount.toFixed(2)}`;
-  };
+  const formatMoney = (val: number) => `$${Math.abs(val).toLocaleString()}`;
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const getRiskLevelColor = (level: string) => {
-    switch (level) {
-      case 'Low': return 'text-semantic-success bg-semantic-success/20';
-      case 'Medium': return 'text-semantic-warning bg-semantic-warning/20';
-      case 'High': return 'text-semantic-danger bg-semantic-danger/20';
-      default: return 'text-text-tertiary bg-navy-accent-dark-dark';
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="text-center">
-          <div className="loading-spinner mx-auto mb-4"></div>
-          <p className="text-body text-text-secondary">Loading trader profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!trader) {
-    return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-body text-text-secondary mb-4">Trader not found</p>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="btn-secondary"
-          >
-            ← Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen bg-[#000202] flex items-center justify-center text-accent-500 font-mono text-xs">DECRYPTING_PROFILE...</div>;
+  if (!trader) return <div className="min-h-screen bg-[#000202] flex items-center justify-center text-neutral-500 font-mono">TARGET_NOT_FOUND</div>;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#000202] text-text-primary font-body pb-12">
       {/* Header */}
-      <header className="header-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="btn-ghost flex items-center space-x-2"
-            >
-              <ArrowLeft className="h-5 w-5" />
-              <span>Back to Dashboard</span>
-            </button>
-            <div className="h-6 w-px bg-border-subtle"></div>
-            <div className="flex items-center space-x-3">
-              <div className="nav-logo-icon">
-                <User className="h-6 w-6 text-cyan-electric" />
-              </div>
-              <h1 className="text-h2 text-text-primary font-display">Trader Profile</h1>
-            </div>
-          </div>
+      <header className="border-b border-neutral-800 bg-[#050A0A] py-4 px-6">
+        <div className="container mx-auto max-w-6xl flex items-center justify-between">
+          <button onClick={() => navigate('/dashboard')} className="flex items-center text-xs font-mono text-neutral-400 hover:text-white uppercase tracking-widest">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Command
+          </button>
+          <div className="text-sm font-display font-bold text-white">PROFILE_ANALYSIS</div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Trader Header */}
-        <div className="card-dark p-8 mb-8">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center space-x-6">
-              <div className="relative">
-                <img
-                  src={trader.profile_image_url}
-                  alt={trader.trader_name}
-                  className="w-20 h-20 rounded-full object-cover bg-navy-accent-dark border-2 border-border-moderate"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `https://ui-avatars.com/api/?name=${trader.trader_name}&background=1a1f3a&color=00d4ff`;
-                  }}
-                />
-                {trader.win_rate > 75 && (
-                  <div className="absolute -top-2 -right-2 bg-semantic-warning rounded-full p-1">
-                    <Award className="h-4 w-4 text-text-primary" />
-                  </div>
-                )}
+      <main className="container mx-auto max-w-6xl px-6 py-8">
+        {/* Identity Card */}
+        <div className="bg-[#050A0A] border border-neutral-800 p-8 mb-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-accent-500/5 rounded-bl-full" />
+          
+          <div className="flex flex-col md:flex-row justify-between items-start gap-6 relative z-10">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 bg-neutral-900 border border-neutral-700 flex items-center justify-center text-2xl font-display font-bold text-white">
+                {trader.trader_name.slice(0,2).toUpperCase()}
               </div>
               <div>
-                <h2 className="text-h1 text-text-primary mb-2 font-display">{trader.trader_name}</h2>
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-small text-text-tertiary">Wallet:</span>
-                    <code className="bg-navy-accent-dark px-3 py-1 rounded text-small font-mono text-text-secondary">
-                      {trader.trader_wallet.slice(0, 10)}...{trader.trader_wallet.slice(-8)}
-                    </code>
-                    <button
-                      onClick={copyWalletAddress}
-                      className={`p-1 rounded transition-colors ${
-                        copySuccess ? 'text-semantic-success' : 'text-text-tertiary hover:text-text-primary'
-                      }`}
-                      title="Copy wallet address"
-                    >
-                      {copySuccess ? (
-                        <CheckCircle className="h-4 w-4" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
+                <h1 className="text-3xl font-display font-bold text-white mb-2">{trader.trader_name}</h1>
+                <div className="flex items-center gap-3">
+                  <code className="bg-neutral-900 px-3 py-1 text-xs font-mono text-accent-500 rounded-sm border border-neutral-800">
+                    {trader.trader_wallet}
+                  </code>
+                  <button onClick={copyAddress} className="text-neutral-500 hover:text-white">
+                    {copySuccess ? <CheckCircle className="w-4 h-4 text-semantic-success" /> : <Copy className="w-4 h-4" />}
+                  </button>
                 </div>
-                {trader.description && (
-                  <p className="text-body text-text-secondary max-w-2xl">{trader.description}</p>
-                )}
               </div>
             </div>
-            
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowAddWalletModal(true)}
-                className="btn-primary flex items-center space-x-2"
+
+            {!isGuest && (
+              <button 
+                onClick={() => setShowAddModal(true)}
+                className="px-6 py-3 bg-accent-500 text-black font-bold font-mono text-xs uppercase hover:bg-accent-400 transition-colors flex items-center gap-2"
               >
-                <Plus className="h-4 w-4" />
-                <span>Add to My Wallets</span>
+                <Plus className="w-4 h-4" />
+                Track Target
               </button>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Performance Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="card-dark p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-small text-text-tertiary">Total Profit</h3>
-              <DollarSign className="h-5 w-5 text-semantic-success" />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: 'Total Net', value: formatMoney(trader.total_profit), icon: DollarSign, color: 'text-semantic-success' },
+            { label: 'Win Rate', value: `${trader.win_rate}%`, icon: Target, color: 'text-accent-500' },
+            { label: 'Executions', value: trader.total_trades, icon: Activity, color: 'text-blue-400' },
+            { label: '30D Change', value: formatMoney(trader.past_month_profit), icon: TrendingUp, color: trader.past_month_profit >= 0 ? 'text-semantic-success' : 'text-semantic-danger' }
+          ].map((stat, i) => (
+            <div key={i} className="bg-[#050A0A] border border-neutral-800 p-6 hover:border-accent-500/20 transition-colors">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-[10px] font-mono text-neutral-500 uppercase">{stat.label}</span>
+                <stat.icon className={`w-4 h-4 ${stat.color}`} />
+              </div>
+              <div className={`text-2xl font-display font-bold ${stat.color}`}>{stat.value}</div>
             </div>
-            <p className="text-h2 font-bold text-semantic-success">
-              +{formatProfit(trader.total_profit)}
-            </p>
-          </div>
-
-          <div className="card-dark p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-small text-text-tertiary">Win Rate</h3>
-              <Target className="h-5 w-5 text-cyan-electric" />
-            </div>
-            <p className="text-h2 font-bold text-text-primary">
-              {trader.win_rate}%
-            </p>
-            <div className="w-full bg-navy-accent-dark rounded-full h-2 mt-2">
-              <div
-                className="bg-cyan-electric h-2 rounded-full"
-                style={{ width: `${Math.min(trader.win_rate, 100)}%` }}
-              ></div>
-            </div>
-          </div>
-
-          <div className="card-dark p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-small text-text-tertiary">Total Trades</h3>
-              <Activity className="h-5 w-5 text-blue-vibrant" />
-            </div>
-            <p className="text-h2 font-bold text-text-primary">
-              {trader.total_trades.toLocaleString()}
-            </p>
-          </div>
-
-          <div className="card-dark p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-small text-text-tertiary">Past Month</h3>
-              {trader.past_month_profit >= 0 ? (
-                <TrendingUp className="h-5 w-5 text-semantic-success" />
-              ) : (
-                <TrendingDown className="h-5 w-5 text-semantic-danger" />
-              )}
-            </div>
-            <p className={`text-h2 font-bold ${
-              trader.past_month_profit >= 0 ? 'text-semantic-success' : 'text-semantic-danger'
-            }`}>
-              {trader.past_month_profit >= 0 ? '+' : ''}{formatProfit(trader.past_month_profit)}
-            </p>
-          </div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Top 5 Most Profitable Trades */}
-          <div className="lg:col-span-2">
-            <div className="card-dark p-6">
-              <h3 className="text-h3 text-text-primary mb-6 flex items-center space-x-2">
-                <BarChart3 className="h-5 w-5 text-cyan-electric" />
-                <span>Top 5 Most Profitable Trades</span>
-              </h3>
-              
-              {topTrades.length === 0 ? (
-                <div className="text-center py-8">
-                  <Activity className="h-12 w-12 text-text-muted mx-auto mb-4" />
-                  <p className="text-body text-text-secondary">No trades data available</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {topTrades.map((trade, index) => (
-                    <div key={trade.id} className="border border-border-subtle rounded-lg p-4 hover:border-border-moderate transition-all duration-standard">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-3">
-                          <span className="bg-navy-accent-dark text-cyan-electric text-small font-medium px-2 py-1 rounded">
-                            #{index + 1}
-                          </span>
-                          <h4 className="font-medium text-text-primary">{trade.market_name}</h4>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`text-lg font-bold ${
-                            trade.profit >= 0 ? 'text-semantic-success' : 'text-semantic-danger'
-                          }`}>
-                            {trade.profit >= 0 ? '+' : ''}{formatProfit(trade.profit)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-small text-text-tertiary">
-                        <div className="flex items-center space-x-4">
-                          <span>Position: <span className="font-medium text-text-secondary">{trade.position}</span></span>
-                          <span>Amount: <span className="font-medium text-text-secondary">{formatProfit(trade.amount)}</span></span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>{formatDate(trade.trade_date)}</span>
-                        </div>
-                      </div>
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Top Trades */}
+          <div className="lg:col-span-2 space-y-4">
+            <h3 className="text-sm font-display font-bold text-white mb-4 border-b border-neutral-800 pb-2">
+              CONVICTION_PLAYS
+            </h3>
+            {topTrades.map((trade, i) => (
+              <div key={trade.id} className="bg-[#050A0A] border border-neutral-800 p-4 flex items-center justify-between hover:border-neutral-700 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="text-[10px] font-mono text-neutral-600">#{i+1}</div>
+                  <div>
+                    <div className="text-sm font-bold text-white mb-1">{trade.market_name}</div>
+                    <div className="flex gap-4 text-[10px] font-mono text-neutral-500">
+                      <span>{trade.position}</span>
+                      <span>{new Date(trade.trade_date).toLocaleDateString()}</span>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
-            </div>
+                <div className={`font-mono font-bold ${trade.profit >= 0 ? 'text-semantic-success' : 'text-semantic-danger'}`}>
+                  {trade.profit >= 0 ? '+' : ''}{formatMoney(trade.profit)}
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* PnL Breakdown */}
+          {/* Risk Metrics */}
           <div className="lg:col-span-1">
-            <div className="card-dark p-6">
-              <h3 className="text-h3 text-text-primary mb-6 flex items-center space-x-2">
-                <BarChart3 className="h-5 w-5 text-cyan-electric" />
-                <span>PnL Breakdown</span>
+            <div className="bg-[#050A0A] border border-neutral-800 p-6 sticky top-24">
+              <h3 className="text-sm font-display font-bold text-white mb-6 border-b border-neutral-800 pb-2 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-accent-500" />
+                RISK_PROFILE
               </h3>
               
               {pnlMetrics && (
-                <div className="space-y-6">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-small text-text-tertiary">Best Single Trade</span>
-                      <span className="text-lg font-bold text-semantic-success">
-                        +{formatProfit(pnlMetrics.best_single_trade)}
-                      </span>
-                    </div>
+                <div className="space-y-6 font-mono text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Best Entry</span>
+                    <span className="text-semantic-success">+{formatMoney(pnlMetrics.best_single_trade)}</span>
                   </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-small text-text-tertiary">Worst Single Trade</span>
-                      <span className="text-lg font-bold text-semantic-danger">
-                        {formatProfit(pnlMetrics.worst_single_trade)}
-                      </span>
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Worst Drawdown</span>
+                    <span className="text-semantic-danger">{formatMoney(pnlMetrics.worst_single_trade)}</span>
                   </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-small text-text-tertiary">Average Position Size</span>
-                      <span className="text-lg font-bold text-text-primary">
-                        {formatProfit(pnlMetrics.avg_position_size)}
-                      </span>
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Avg Size</span>
+                    <span className="text-white">{formatMoney(pnlMetrics.avg_position_size)}</span>
                   </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-small text-text-tertiary">Win Rate</span>
-                      <span className="text-lg font-bold text-text-primary">
-                        {pnlMetrics.win_rate_percentage}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-navy-accent-dark rounded-full h-2">
-                      <div
-                        className="bg-cyan-electric h-2 rounded-full"
-                        style={{ width: `${Math.min(pnlMetrics.win_rate_percentage, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-small text-text-tertiary">Largest Position</span>
-                      <span className="text-lg font-bold text-text-primary">
-                        {formatProfit(pnlMetrics.largest_position)}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-small text-text-tertiary">Risk Level</span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskLevelColor(pnlMetrics.risk_level)}`}>
-                        {pnlMetrics.risk_level}
-                      </span>
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Risk Rating</span>
+                    <span className="px-2 py-0.5 bg-neutral-900 text-white rounded border border-neutral-800">
+                      {pnlMetrics.risk_level.toUpperCase()}
+                    </span>
                   </div>
                 </div>
               )}
@@ -520,67 +252,13 @@ export default function TraderProfile() {
         </div>
       </main>
 
-      {/* Add Wallet Modal */}
-      {showAddWalletModal && (
-        <div className="modal-overlay" onClick={() => setShowAddWalletModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-h3 text-text-primary">Add Wallet to My Wallets</h3>
-              <button
-                onClick={() => setShowAddWalletModal(false)}
-                className="text-text-tertiary hover:text-text-primary transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="auth-label">
-                  Wallet Address
-                </label>
-                <div className="bg-navy-accent-dark border border-border-subtle rounded-lg p-3 text-small font-mono text-text-secondary">
-                  {walletAddress}
-                </div>
-              </div>
-
-              <div>
-                <label className="auth-label">
-                  Label (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={walletLabel}
-                  onChange={(e) => setWalletLabel(e.target.value)}
-                  className="input-dark w-full focus-glow"
-                  placeholder={trader?.trader_name || 'Enter a label'}
-                />
-              </div>
-
-              <div className="flex space-x-3 pt-4">
-                <button
-                  onClick={() => setShowAddWalletModal(false)}
-                  className="flex-1 px-4 py-3 border border-border-subtle text-text-secondary rounded-lg hover:bg-navy-hover hover:text-text-primary transition-all duration-standard"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddToWallets}
-                  disabled={addWalletLoading}
-                  className="flex-1 btn-primary disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                >
-                  {addWalletLoading ? (
-                    <div className="loading-spinner"></div>
-                  ) : (
-                    <>
-                      <Plus className="h-4 w-4" />
-                      <span>Add Wallet</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
+      {/* Add Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <AddWalletForm 
+            onSubmit={async (addr, label) => handleAddToWallets(addr, label)} 
+            onCancel={() => setShowAddModal(false)} 
+          />
         </div>
       )}
     </div>

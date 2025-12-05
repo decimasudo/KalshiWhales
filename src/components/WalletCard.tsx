@@ -11,39 +11,42 @@ export default function WalletCard({ wallet, onDelete }: WalletCardProps) {
   const explorerUrl = `https://polygonscan.com/address/${wallet.wallet_address}`;
 
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 border border-gray-200">
+    <div className="bg-[#050A0A] border border-neutral-800 p-6 group hover:border-accent-500/50 transition-colors relative overflow-hidden">
+      {/* Decorative Corner */}
+      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-accent-500/0 group-hover:border-accent-500/50 transition-all" />
+
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="bg-indigo-100 p-2 rounded-lg">
-            <Wallet className="h-5 w-5 text-indigo-600" />
+          <div className="p-2 bg-accent-500/10 border border-accent-500/20">
+            <Wallet className="h-5 w-5 text-accent-500" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">
-              {wallet.label || 'Unnamed Wallet'}
+            <h3 className="font-bold text-white font-display tracking-wide uppercase text-sm">
+              {wallet.label || 'UNKNOWN_TARGET'}
             </h3>
-            <code className="text-sm text-gray-500">{shortAddress}</code>
+            <code className="text-xs text-neutral-500 font-mono">{shortAddress}</code>
           </div>
         </div>
         <button
           onClick={() => onDelete(wallet.id)}
-          className="text-gray-400 hover:text-red-600 transition-colors"
-          title="Stop tracking"
+          className="text-neutral-600 hover:text-semantic-danger transition-colors p-1"
+          title="Terminate Tracking"
         >
           <Trash2 className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-        <span className="text-xs text-gray-500">
-          Added {new Date(wallet.created_at).toLocaleDateString('en-US')}
+      <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
+        <span className="text-[10px] font-mono text-neutral-600 uppercase">
+          INIT: {new Date(wallet.created_at).toLocaleDateString('en-US')}
         </span>
         <a
           href={explorerUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center space-x-1 text-xs text-indigo-600 hover:text-indigo-700"
+          className="flex items-center space-x-1 text-[10px] font-mono text-accent-500/80 hover:text-accent-400 uppercase"
         >
-          <span>View on Explorer</span>
+          <span>Scan_Explorer</span>
           <ExternalLink className="h-3 w-3" />
         </a>
       </div>

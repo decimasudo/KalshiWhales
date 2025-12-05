@@ -5,9 +5,11 @@ import { User } from '@supabase/supabase-js';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  isGuest: boolean; // NEW: Track guest status
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  continueAsGuest: () => void; // NEW: Function to enable guest mode
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,9 +17,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    // Load user on mount
+    // Check for guest session
+    const guestSession = localStorage.getItem('kalshi_guest');
+    if (guestSession === 'true') {
+      setIsGuest(true);
+    }
+
+    // Load supabase user
     async function loadUser() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -30,10 +39,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     loadUser();
 
-    // Set up auth listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user || null);
+        if (session?.user) {
+          // If real user logs in, disable guest mode
+          setIsGuest(false);
+          localStorage.removeItem('kalshi_guest');
+        }
       }
     );
 
@@ -57,12 +70,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    // Check if user is actually logged in before calling supabase signOut
+    if (user) {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    }
+    
+    // Clear guest state
+    setIsGuest(false);
+    localStorage.removeItem('kalshi_guest');
+  };
+
+  const continueAsGuest = () => {
+    setIsGuest(true);
+    localStorage.setItem('kalshi_guest', 'true');
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, isGuest, signIn, signUp, signOut, continueAsGuest }}>
       {children}
     </AuthContext.Provider>
   );

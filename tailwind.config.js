@@ -17,163 +17,72 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Dark Navy Pulse Theme Colors
-        navy: {
-          deepest: '#0a0e27',
-          deep: '#0f1419',
-          elevated: '#1a1f3a',
-          hover: '#1e2847',
-          accent: {
-            dark: '#243154'
-          }
-        },
-        cyan: {
-          electric: '#00d4ff',
-          teal: '#06b6d4'
-        },
-        blue: {
-          vibrant: '#0ea5e9',
-          light: '#38bdf8'
-        },
-        text: {
-          primary: '#f1f5f9',
-          secondary: '#cbd5e1',
-          tertiary: '#94a3b8',
-          muted: '#64748b'
-        },
-        semantic: {
-          success: '#10b981',
-          danger: '#ef4444',
-          warning: '#f59e0b'
-        },
-        border: {
-          subtle: 'rgba(255, 255, 255, 0.08)',
-          moderate: 'rgba(255, 255, 255, 0.12)',
-          accent: 'rgba(6, 182, 212, 0.3)'
-        },
-        // Keep existing variables for compatibility
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        // --- ENIGMA PROTOCOL PALETTE (Green/Teal/Black) ---
         primary: {
-          DEFAULT: '#0ea5e9',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT: '#06b6d4',
-          foreground: 'hsl(var(--secondary-foreground))',
+          50: '#F0FDFA',
+          100: '#CCFBF1',
+          500: '#14B8A6', // Teal
+          700: '#0F766E',
+          900: '#134E4A',
         },
         accent: {
-          DEFAULT: '#00d4ff',
-          foreground: 'hsl(var(--accent-foreground))',
+          400: '#5FFAD0', // Highlight glow
+          500: '#00E0D0', // MAIN BRAND COLOR (The Enigma Green)
+          600: '#00B3A6', 
+          900: '#00423D', 
         },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+        neutral: {
+          0: '#000000',
+          50: '#040F0D', // Tinted Black
+          100: '#0A1412',
+          200: '#162120',
+          300: '#A3A3A3',
+          400: '#525252',
         },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+        background: {
+          page: '#000202', // Deepest Black
+          surface: '#050A0A', // Card Backgrounds
         },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+        text: {
+          primary: '#F5F5F5',
+          secondary: '#A3A3A3',
+          tertiary: '#525252',
+          muted: '#262626'
         },
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+        semantic: {
+          success: '#10B981', // Green
+          danger: '#EF4444',  // Red
+          warning: '#F59E0B', // Yellow
         },
-      },
-      backgroundImage: {
-        'gradient-hero': 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%)',
-        'gradient-card': 'linear-gradient(180deg, #1a1f3a 0%, #151a30 100%)',
-        'gradient-button': 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
-      },
-      boxShadow: {
-        'card': '0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.5)',
-        'modal': '0 0 0 1px rgba(255, 255, 255, 0.1), 0 20px 60px rgba(0, 0, 0, 0.7)',
-        'glow-cyan-sm': '0 0 12px rgba(0, 212, 255, 0.4)',
-        'glow-cyan-md': '0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.3)',
-        'glow-cyan-lg': '0 0 30px rgba(0, 212, 255, 0.6), 0 0 60px rgba(0, 212, 255, 0.4), 0 0 90px rgba(0, 212, 255, 0.2)',
-        'glow-blue': '0 0 20px rgba(14, 165, 233, 0.5)',
-        'glow-green': '0 0 16px rgba(16, 185, 129, 0.4)',
-        'glow-red': '0 0 16px rgba(239, 68, 68, 0.4)',
-      },
-      borderRadius: {
-        lg: 'var(--radius)',
-        md: 'var(--radius)',
-        sm: 'var(--radius)',
+        border: {
+          subtle: 'rgba(0, 224, 208, 0.1)',
+          moderate: 'rgba(0, 224, 208, 0.2)',
+          strong: 'rgba(0, 224, 208, 0.5)'
+        }
       },
       fontFamily: {
-        primary: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-        display: "'Space Grotesk', 'Inter', sans-serif",
-        mono: "'JetBrains Mono', 'Fira Code', monospace",
+        display: ['"Space Grotesk"', 'sans-serif'], // Enigma Heading Font
+        body: ['"Inter"', 'sans-serif'],            // Enigma Body Font
+        mono: ['"JetBrains Mono"', 'monospace'],    // Code/Terminal Font
       },
-      fontSize: {
-        hero: '56px',
-        h1: '40px',
-        h2: '32px',
-        h3: '24px',
-        'body-lg': '18px',
-        body: '16px',
-        small: '14px',
-        xs: '12px',
+      backgroundImage: {
+        'gradient-hero': 'radial-gradient(circle at center, rgba(0, 224, 208, 0.08) 0%, #000202 70%)',
+        'gradient-card': 'linear-gradient(180deg, rgba(5, 10, 10, 0.9) 0%, rgba(0, 0, 0, 0.9) 100%)',
+        'grid-pattern': 'linear-gradient(rgba(0,224,208,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,224,208,0.05) 1px, transparent 1px)',
       },
-      keyframes: {
-        'accordion-down': {
-          from: { height: 0 },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: 0 },
-        },
-        'pulse-glow': { // For the Waveform
-          '0%, 100%': { 
-            opacity: '0.7',
-            filter: 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.4))'
-          },
-          '50%': { 
-            opacity: '1',
-            filter: 'drop-shadow(0 0 40px rgba(0, 212, 255, 0.8))'
-          }
-        },
-        'wavefloat': { // For the Waveform
-          '0%, 100%': { transform: 'translateX(-20px) translateY(-5px)' },
-          '50%': { transform: 'translateX(20px) translateY(5px)' },
-        },
-        'glow-float-1': { // For the Background
-          '0%, 100%': { opacity: '0.05', transform: 'translateY(0px)' },
-          '50%': { opacity: '0.15', transform: 'translateY(-15px)' },
-        },
-        'glow-float-2': { // For the Background
-          '0%, 100%': { opacity: '0.05', transform: 'translateY(0px)' },
-          '50%': { opacity: '0.15', transform: 'translateY(10px)' },
-        },
-        'glow-float-3': { // For the Background
-          '0%, 100%': { opacity: '0.05', transform: 'translateY(0px)' },
-          '50%': { opacity: '0.15', transform: 'translateY(-10px)' },
-        },
+      boxShadow: {
+        'glow': '0 0 20px rgba(0, 224, 208, 0.5), 0 0 40px rgba(0, 224, 208, 0.2)',
+        'glow-sm': '0 0 10px rgba(0, 224, 208, 0.3)',
+        'card': '0 0 1px rgba(0, 224, 208, 0.5), inset 0 0 20px rgba(0, 224, 208, 0.05)',
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
-        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-        'wavefloat': 'wavefloat 3s ease-in-out infinite',
-        'glow-float-1': 'glow-float-1 3s ease-in-out infinite alternate',
-        'glow-float-2': 'glow-float-2 1s ease-in-out infinite alternate',
-        'glow-float-3': 'glow-float-3 2s ease-in-out infinite alternate',
+        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
-      transitionDuration: {
-        fast: '150ms',
-        standard: '250ms',
-        slow: '350ms',
-      },
-      transitionTimingFunction: {
-        default: 'ease-out',
-        sharp: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-        smooth: 'ease-in-out',
+      keyframes: {
+        'pulse-glow': {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0.7 },
+        },
       },
     },
   },
