@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Activity, TrendingUp, Bell, Eye, Users, BarChart3, Zap, Shield, 
-  CheckCircle, ArrowRight, X, Terminal, Cpu, Globe, Bot 
+  CheckCircle, ArrowRight, X, Terminal, Cpu, Globe, Bot, Github, Twitter 
 } from 'lucide-react';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -195,6 +195,14 @@ export default function Landing({ onShowAuth }: LandingProps) {
             >
               Sign Up
             </button>
+            <div className="flex items-center space-x-3 ml-6">
+              <a href="https://github.com/decimasudo/KalshiWhales" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+                <Github className="w-5 h-5" />
+              </a>
+              <a href="https://x.com/kalshiwhalesai" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors">
+                <Twitter className="w-5 h-5" />
+              </a>
+            </div>
           </div>
         </div>
       </nav>
