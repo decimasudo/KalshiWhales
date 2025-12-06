@@ -219,14 +219,14 @@ export default function Landing({ onShowAuth }: LandingProps) {
             </div>
 
             <h1 className="text-6xl md:text-8xl font-display font-bold tracking-tighter text-white mb-6 leading-none">
-              TRACK THE <br/>
+              Track Wallet on Kalshi <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-b from-accent-400 to-accent-600 drop-shadow-[0_0_30px_rgba(0,224,208,0.3)]">
-                SMART MONEY
+                Get Real-Time alert
               </span>
             </h1>
 
             <p className="text-lg md:text-xl text-neutral-400 font-light mb-12 max-w-2xl mx-auto leading-relaxed">
-              De-anonymize Polymarket whales. Analyze betting patterns, copy-trade top performers, and get <span className="text-accent-500">instant alerts</span> on high-conviction plays.
+              Monitor profitable Bentors, analyze their strategies, and get <span className="text-accent-500"> instant notifications via Telegram </span>. Start making smarter trading decisions today. 
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
@@ -254,7 +254,7 @@ export default function Landing({ onShowAuth }: LandingProps) {
         {/* Ticker at Bottom */}
         <div className="absolute bottom-0 left-0 w-full h-24 border-t border-neutral-800 bg-[#000202]/80 backdrop-blur-md z-20 hidden md:block">
           <div className="container mx-auto h-full grid grid-cols-4">
-            <StatTicker label="TRACKED WALLETS" value="500+" />
+            <StatTicker label="MONITOR PROFITABLE BETTORS" value="500+" />
             <StatTicker label="TOTAL VOLUME" value="$2M+" />
             <StatTicker label="ACTIVE ALERTS" value="10K+" />
             <StatTicker label="SYSTEM STATUS" value="OPERATIONAL" />

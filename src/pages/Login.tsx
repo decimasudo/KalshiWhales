@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Activity, LogIn } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Activity, LogIn, ArrowRight, Shield, Terminal } from 'lucide-react';
+
+// Enigma Design Component
+const CoordinateLabel = ({ x, y }: { x: number; y: number }) => (
+  <div className="absolute top-4 left-4 text-[9px] font-mono text-accent-500/40 tracking-widest pointer-events-none select-none">
+    X:{x} Y:{y}
+  </div>
+);
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,7 +17,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, continueAsGuest } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,119 +29,128 @@ export default function Login() {
     try {
       if (isSignUp) {
         await signUp(email, password);
-        setMessage('Check your email to confirm your registration!');
+        setMessage('IDENTITY_CREATED: Check transmission logs (email) for verification.');
         setEmail('');
         setPassword('');
       } else {
         await signIn(email, password);
+        navigate('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(err.message || 'ACCESS_DENIED');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGuestAccess = () => {
+    continueAsGuest();
+    navigate('/dashboard');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
-        <div className="flex items-center justify-center mb-8">
-          <div className="bg-indigo-600 p-3 rounded-lg">
-            <Activity className="h-8 w-8 text-white" />
+    <div className="min-h-screen bg-[#000202] text-text-primary font-body flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,224,208,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,224,208,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      
+      <div className="w-full max-w-md bg-[#050A0A] border border-accent-500/30 relative z-10 shadow-[0_0_50px_rgba(0,224,208,0.1)] p-8">
+        <CoordinateLabel x={12} y={88} />
+
+        {/* Header */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-12 h-12 bg-accent-500/10 flex items-center justify-center rounded-sm border border-accent-500/20 mb-4">
+            <Terminal className="w-6 h-6 text-accent-500" />
           </div>
+          <h1 className="text-3xl font-display font-bold text-white tracking-tight">
+            KALSHI<span className="text-accent-500">WHALES</span>
+          </h1>
+          <p className="text-xs font-mono text-neutral-500 mt-2 uppercase tracking-widest">
+            Restricted Access Terminal
+          </p>
         </div>
 
-        <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">
-          PolyWhales
-        </h1>
-        <p className="text-center text-gray-600 mb-8">
-          Track Polymarket traders with real-time alerts
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label className="block text-[10px] font-mono text-accent-500 uppercase mb-2">Identifier (Email)</label>
             <input
               type="email"
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full bg-black border border-neutral-800 text-white p-3 font-mono text-sm focus:border-accent-500 focus:outline-none transition-colors placeholder-neutral-700"
+              placeholder="OPERATOR@SYSTEM"
               required
               disabled={loading}
-              placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+            <label className="block text-[10px] font-mono text-accent-500 uppercase mb-2">Access Key (Password)</label>
             <input
               type="password"
-              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              required
-              disabled={loading}
+              className="w-full bg-black border border-neutral-800 text-white p-3 font-mono text-sm focus:border-accent-500 focus:outline-none transition-colors placeholder-neutral-700"
               placeholder="••••••••"
+              required
               minLength={6}
+              disabled={loading}
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="p-3 bg-red-900/20 border border-red-500/30 text-red-400 text-xs font-mono">
+              ERROR: {error}
             </div>
           )}
 
           {message && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-              <p className="text-sm text-green-600">{message}</p>
+            <div className="p-3 bg-green-900/20 border border-green-500/30 text-green-400 text-xs font-mono">
+              {message}
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            className="w-full py-4 bg-accent-500 text-black font-bold font-mono text-xs uppercase tracking-widest hover:bg-accent-400 transition-colors flex items-center justify-center gap-2"
           >
-            <LogIn className="h-4 w-4" />
-            <span>{loading ? 'Processing...' : isSignUp ? 'Sign Up' : 'Sign In'}</span>
+            {loading ? (
+              <span className="animate-pulse">AUTHENTICATING...</span>
+            ) : (
+              <>
+                <LogIn className="w-4 h-4" />
+                <span>{isSignUp ? 'INITIALIZE IDENTITY' : 'DECRYPT SESSION'}</span>
+              </>
+            )}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 flex flex-col gap-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-neutral-800"></span></div>
+            <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#050A0A] px-2 text-neutral-600 font-mono">Alternative Access</span></div>
+          </div>
+
+          <button
+            onClick={handleGuestAccess}
+            className="w-full py-3 border border-neutral-700 text-neutral-300 font-mono text-xs uppercase tracking-widest hover:border-accent-500 hover:text-accent-500 transition-colors flex items-center justify-center gap-2"
+          >
+            <Shield className="w-4 h-4" />
+            <span>Enter as Guest</span>
+          </button>
+
           <button
             onClick={() => {
               setIsSignUp(!isSignUp);
               setError('');
               setMessage('');
             }}
-            className="text-sm text-indigo-600 hover:text-indigo-700"
+            className="text-xs font-mono text-neutral-500 hover:text-white transition-colors text-center mt-2"
           >
             {isSignUp
-              ? 'Already have an account? Sign In'
-              : 'Don\'t have an account? Sign Up'}
+              ? 'ALREADY REGISTERED? LOGIN'
+              : 'NO CREDENTIALS? SIGN UP'}
           </button>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">
-            Use Telegram bot{' '}
-            <a
-              href="https://t.me/PolyWhales_bot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-600 hover:text-indigo-700 font-medium"
-            >
-              @PolyWhales_bot
-            </a>{' '}
-            for real-time notifications
-          </p>
         </div>
       </div>
     </div>

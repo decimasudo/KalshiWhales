@@ -1,4 +1,4 @@
-# PolyWhales Platform
+# KalshiWhales Platform
 
 **Track Top Polymarket Traders with Real-Time Alerts**
 
@@ -8,11 +8,11 @@
 ##  Live Demo
 
 - **Production URL**: [https://rtinbdijt8uh.space.minimax.io](https://rtinbdijt8uh.space.minimax.io)
-- **Telegram Bot**: [@PolyWhales_bot](https://t.me/PolyWhales_bot)
+- **Telegram Bot**: [@KalshiWhales_bot](https://t.me/Kalshiwhales_bot)
 
 ## Overview
 
-PolyWhales adalah platform komprehensif untuk tracking performance trader di Polymarket dengan notifikasi real-time via Telegram bot. Platform menyediakan landing page untuk guest users dan full-featured dashboard untuk authenticated users.
+KalshiWhales adalah platform komprehensif untuk tracking performance trader di Polymarket dengan notifikasi real-time via Telegram bot. Platform menyediakan landing page untuk guest users dan full-featured dashboard untuk authenticated users.
 
 ### Key Features
 
@@ -42,8 +42,8 @@ PolyWhales adalah platform komprehensif untuk tracking performance trader di Pol
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/polywhales-platform.git
-cd polywhales-platform
+git clone https://github.com/yourusername/KalshiWhales.git
+cd KalshiWhales-platform
 pnpm install
 cp .env.example .env
 # Edit .env dengan your credentials
@@ -120,7 +120,7 @@ MIT License
 
 ## Support
 
-- Telegram: [@PolyWhales_bot](https://t.me/PolyWhales_bot)
+- Telegram: [@KalshiWhales](https://t.me/Kalshiwhales_bot)
 - Issues: GitHub Issues
 
 ---
